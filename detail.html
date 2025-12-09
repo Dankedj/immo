@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de l'article - Toyota RAV4 2020</title>
+    <script src="./tailwind.js"></script>
+    <link rel="stylesheet" href="./all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="./gfont.css" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .gallery-thumb {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .gallery-thumb:hover {
+            transform: scale(1.05);
+        }
+        .gallery-thumb.active {
+            border: 2px solid #1e40af;
+            transform: scale(1.05);
+        }
+        .modal {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        .toast {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .toast.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+        <div class="container mx-auto px-3 py-2">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-1">
+                    <a href="#" class="flex items-center space-x-1">
+                        <div class="bg-white text-blue-900 p-1 rounded">
+                            <i class="fas fa-store text-base"></i>
+                        </div>
+                        <span class="text-lg font-bold">MarketPlace</span>
+                    </a>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-home mr-1"></i>Accueil</a>
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-search mr-1"></i>Rechercher</a>
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-user-circle mr-1"></i>Mon compte</a>
+                    <a href="#" class="bg-white text-blue-900 py-1 px-3 rounded font-medium hover:bg-blue-50 text-sm">Déposer</a>
+                </nav>
+                
+                <!-- Menu mobile -->
+                <button id="mobile-menu-btn" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-3 py-4 flex flex-col items-center">
+        <!-- Fil d'Ariane -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <div class="text-xs text-gray-600">
+                <a href="#" class="hover:text-blue-700">Accueil</a> 
+                <span class="mx-1">/</span>
+                <a href="#" class="hover:text-blue-700">Voitures</a>
+                <span class="mx-1">/</span>
+                <a href="#" class="hover:text-blue-700">Toyota</a>
+                <span class="mx-1">/</span>
+                <span class="text-gray-800 font-medium">Toyota RAV4 2020</span>
+            </div>
+            <!-- Bouton Nous contacter -->
+            <div>
+                <button id="contact-btn" class="w-full sm:w-auto bg-blue-900 hover:bg-blue-800 text-white py-1 px-4 rounded font-bold text-base transition duration-300 shadow">
+                    <i class="fas fa-phone-alt mr-1"></i> Contacter
+                </button>
+            </div>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row gap-4 lg:w-[80%]">
+            <!-- Première section : Galerie d'images -->
+            <section class="lg:w-1/2">
+                <!-- Image principale -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-3">
+                    <div class="relative h-64 sm:h-80 bg-gray-100">
+                        <img id="main-image" src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Toyota RAV4 2020 - Vue principale" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-blue-900 text-white text-xs font-medium px-2 py-1 rounded-full">
+                            À vendre
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-white text-blue-900 text-xs font-medium px-2 py-1 rounded-full">
+                            <i class="fas fa-eye mr-1"></i> 245 vues
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Galerie de miniatures -->
+                <div class="bg-white rounded-lg shadow p-3">
+                    <h3 class="font-bold text-gray-700 mb-2 text-sm">Galerie photos</h3>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                        <!-- Miniatures -->
+                        <div class="gallery-thumb active rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Vue principale">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Vue principale" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                        
+                        <div class="gallery-thumb rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Intérieur">
+                            <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Intérieur" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                        
+                        <div class="gallery-thumb rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Tableau de bord">
+                            <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Tableau de bord" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                        
+                        <div class="gallery-thumb rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Vue arrière">
+                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Vue arrière" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                        
+                        <div class="gallery-thumb rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Moteur">
+                            <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Moteur" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                        
+                        <div class="gallery-thumb rounded overflow-hidden" data-image="https://images.unsplash.com/photo-1563720223484-21c6c2d3c6c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Jantes">
+                            <img src="https://images.unsplash.com/photo-1563720223484-21c6c2d3c6c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Jantes" class="w-full h-14 sm:h-16 object-cover">
+                        </div>
+                    </div>
+                    
+                    <!-- Légende de l'image -->
+                    <div class="mt-2 text-center">
+                        <p id="image-caption" class="text-xs text-gray-600">Vue principale du Toyota RAV4 2020</p>
+                    </div>
+                </div>
+                
+                <!-- Informations supplémentaires -->
+                <div class="mt-4 bg-white rounded-lg shadow p-4">
+                    <h3 class="font-bold text-gray-700 mb-2 text-sm">Caractéristiques techniques</h3>
+                    <div class="grid grid-cols-2 gap-1">
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Année</span>
+                            <span class="font-medium text-xs">2020</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Kilométrage</span>
+                            <span class="font-medium text-xs">45,000 km</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Carburant</span>
+                            <span class="font-medium text-xs">Essence</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Transmission</span>
+                            <span class="font-medium text-xs">Automatique</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Couleur</span>
+                            <span class="font-medium text-xs">Gris métallisé</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b">
+                            <span class="text-gray-600 text-xs">Portes</span>
+                            <span class="font-medium text-xs">5</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Articles similaires -->
+                <div class="bg-white rounded-lg shadow p-4 mt-2">
+                    <h3 class="font-bold text-gray-700 mb-2 text-sm">Articles similaires</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <!-- Article similaire 1 -->
+                        <a href="#" class="flex items-center p-2 border rounded hover:border-blue-300 hover:bg-blue-50 transition">
+                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden mr-2">
+                                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="SUV similaire" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-gray-800 text-xs truncate">Honda CR-V 2019</h4>
+                                <p class="text-blue-900 font-bold text-sm">14,200 $</p>
+                                <p class="text-xs text-gray-600 truncate">Kinshasa</p>
+                            </div>
+                        </a>
+                        
+                        <!-- Article similaire 2 -->
+                        <a href="#" class="flex items-center p-2 border rounded hover:border-blue-300 hover:bg-blue-50 transition">
+                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden mr-2">
+                                <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="SUV similaire" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-gray-800 text-xs truncate">Mazda CX-5 2021</h4>
+                                <p class="text-blue-900 font-bold text-sm">18,500 $</p>
+                                <p class="text-xs text-gray-600 truncate">Lubumbashi</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Deuxième section : Informations détaillées -->
+            <section class="lg:w-1/2">
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <!-- En-tête avec titre et prix -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-3 border-b">
+                        <div class="flex-1">
+                            <h1 class="text-xl sm:text-2xl font-bold text-gray-800 mb-1">Toyota RAV4 2020</h1>
+                            <div class="flex flex-wrap items-center text-gray-600 text-xs">
+                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                <span>Kinshasa, Gombe</span>
+                                <span class="mx-1">•</span>
+                                <i class="far fa-clock mr-1"></i>
+                                <span>Publié il y a 2 jours</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 sm:mt-0 sm:ml-4">
+                            <div class="text-2xl sm:text-3xl font-bold text-blue-900">15,500 $</div>
+                            <div class="text-gray-600 text-xs sm:text-sm text-right">Prix négociable</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Catégorie et vendeur -->
+                    <div class="mb-4">
+                        <div class="flex flex-wrap items-center gap-1 mb-3">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">Voiture</span>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">SUV</span>
+                            <span class="bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded">Toyota</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded">Occasion</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <h3 class="text-lg font-bold text-gray-700 mb-2">Description</h3>
+                        <div class="text-gray-700 text-sm space-y-1">
+                            <p>Je vends mon Toyota RAV4 2020 en excellent état. Le véhicule a été régulièrement entretenu chez le concessionnaire Toyota et n'a jamais eu d'accident.</p>
+                            <p><strong>Équipements inclus :</strong></p>
+                            <ul class="list-disc pl-4 space-y-0.5">
+                                <li>Climatisation automatique bi-zone</li>
+                                <li>Système de navigation GPS avec écran tactile 8"</li>
+                                <li>Caméra de recul avec détecteurs de recul</li>
+                                <li>Sièges en cuir chauffants</li>
+                                <li>Système audio premium JBL</li>
+                                <li>Toit panoramique ouvrant</li>
+                                <li>Régulateur et limiteur de vitesse adaptatif</li>
+                                <li>Aide au maintien dans la voie</li>
+                                <li>Freinage d'urgence automatique</li>
+                            </ul>
+                            <p class="mt-1">Le véhicule est garanti jusqu'en décembre 2023. Carnet d'entretien complet disponible. Contrôle technique récent effectué.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white pt-6 pb-4 mt-8">
+        <div class="container mx-auto px-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <!-- Logo et description -->
+                <div>
+                    <div class="flex items-center space-x-1 mb-2">
+                        <div class="bg-white text-blue-900 p-1 rounded">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <span class="text-lg font-bold">MarketPlace</span>
+                    </div>
+                    <p class="text-blue-200 text-xs mb-4">La plateforme de confiance pour acheter et vendre des biens et services en RDC.</p>
+                </div>
+                
+                <!-- Liens rapides -->
+                <div>
+                    <h3 class="text-base font-bold mb-2">Liens rapides</h3>
+                    <ul class="space-y-1">
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-xs">Accueil</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-xs">À propos</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-xs">Contact</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-xs">Conditions</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-base font-bold mb-2">Contactez-nous</h3>
+                    <ul class="space-y-1">
+                        <li class="flex items-center text-xs">
+                            <i class="fas fa-phone mr-2 text-blue-300"></i>
+                            <span class="text-blue-200">+243 81 234 5678</span>
+                        </li>
+                        <li class="flex items-center text-xs">
+                            <i class="fas fa-envelope mr-2 text-blue-300"></i>
+                            <span class="text-blue-200">info@marketplace.cd</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Ligne de séparation -->
+            <div class="border-t border-blue-800 pt-3">
+                <div class="flex flex-col sm:flex-row justify-between items-center">
+                    <p class="text-blue-300 text-xs mb-2 sm:mb-0">&copy; 2023 MarketPlace. Tous droits réservés.</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="text-blue-300 hover:text-white text-xs">Confidentialité</a>
+                        <a href="#" class="text-blue-300 hover:text-white text-xs">Mentions légales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de contact -->
+    <div id="contact-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-2">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="modal-content relative bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <!-- En-tête du modal -->
+            <div class="bg-blue-900 text-white rounded-t-lg p-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-base font-bold">Prendre contact</h3>
+                    <button id="close-modal" class="text-white hover:text-blue-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-blue-200 text-xs mt-1">Remplissez le formulaire pour nous contacter</p>
+            </div>
+            
+            <!-- Formulaire -->
+            <form id="contact-form" class="p-3">
+                <!-- Numéro de téléphone -->
+                <div class="mb-3">
+                    <label for="phone" class="block text-gray-700 font-medium mb-1 text-xs">
+                        Téléphone <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+                            <i class="fas fa-phone text-gray-400 text-xs"></i>
+                        </div>
+                        <input type="tel" id="phone" name="phone" required 
+                               class="w-full pl-7 pr-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                               placeholder="Ex: +243 81 234 5678">
+                    </div>
+                    <p class="text-gray-500 text-xs mt-0.5">Nous utiliserons ce numéro pour vous contacter</p>
+                </div>
+                
+                <!-- Moyen de contact préféré -->
+                <div class="mb-3">
+                    <label class="block text-gray-700 font-medium mb-1 text-xs">
+                        Comment contacter ?<span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-1">
+                        <label class="flex items-center cursor-pointer p-1 hover:bg-gray-50 rounded">
+                            <input type="radio" name="contact-method" value="whatsapp" class="h-3 w-3 text-blue-600" checked>
+                            <div class="ml-1 flex-1 min-w-0">
+                                <span class="text-gray-700 font-medium text-xs">WhatsApp</span>
+                                <p class="text-gray-500 text-xs truncate">Contact via WhatsApp</p>
+                            </div>
+                            <div class="ml-1 text-green-500">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer p-1 hover:bg-gray-50 rounded">
+                            <input type="radio" name="contact-method" value="phone" class="h-3 w-3 text-blue-600">
+                            <div class="ml-1 flex-1 min-w-0">
+                                <span class="text-gray-700 font-medium text-xs">Appel</span>
+                                <p class="text-gray-500 text-xs truncate">Appel téléphonique</p>
+                            </div>
+                            <div class="ml-1 text-blue-500">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer p-1 hover:bg-gray-50 rounded">
+                            <input type="radio" name="contact-method" value="sms" class="h-3 w-3 text-blue-600">
+                            <div class="ml-1 flex-1 min-w-0">
+                                <span class="text-gray-700 font-medium text-xs">SMS</span>
+                                <p class="text-gray-500 text-xs truncate">Message SMS</p>
+                            </div>
+                            <div class="ml-1 text-blue-400">
+                                <i class="fas fa-sms"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Message optionnel -->
+                <div class="mb-3">
+                    <label for="message" class="block text-gray-700 font-medium mb-1 text-xs">
+                        Message (optionnel)
+                    </label>
+                    <textarea id="message" name="message" rows="2"
+                              class="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              placeholder="Bonjour, je suis intéressé par votre Toyota RAV4..."></textarea>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="flex flex-col sm:flex-row gap-1 pt-1">
+                    <button type="button" id="cancel-btn" class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 py-1 px-2 rounded font-medium text-xs transition">
+                        Annuler
+                    </button>
+                    <button type="submit" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-1 px-2 rounded font-medium text-xs transition">
+                        <i class="fas fa-paper-plane mr-1"></i> Confirmer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast de confirmation -->
+    <div id="toast" class="toast fixed bottom-2 right-2 z-50">
+        <div class="bg-green-500 text-white rounded shadow p-3 max-w-xs">
+            <div class="flex items-center">
+                <div class="bg-green-600 rounded-full p-1 mr-2">
+                    <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-sm">Message envoyé !</h4>
+                    <p class="text-xs text-green-100">Nous vous contacterons bientôt.</p>
+                </div>
+                <button id="close-toast" class="ml-2 text-white hover:text-green-200">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+            <!-- Barre de progression -->
+            <div class="mt-1 h-0.5 bg-green-400 rounded overflow-hidden">
+                <div id="toast-progress" class="h-full bg-green-300"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion de la galerie d'images
+        document.querySelectorAll('.gallery-thumb').forEach(thumb => {
+            thumb.addEventListener('click', function() {
+                const imageUrl = this.getAttribute('data-image');
+                const imageAlt = this.getAttribute('data-alt');
+                
+                const mainImage = document.getElementById('main-image');
+                mainImage.src = imageUrl;
+                mainImage.alt = imageAlt;
+                
+                document.getElementById('image-caption').textContent = imageAlt;
+                
+                document.querySelectorAll('.gallery-thumb').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                this.classList.add('active');
+            });
+        });
+        
+        // Gestion du modal de contact
+        const contactBtn = document.getElementById('contact-btn');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const contactModal = document.getElementById('contact-modal');
+        const contactForm = document.getElementById('contact-form');
+        
+        contactBtn.addEventListener('click', () => {
+            contactModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        const closeModal = () => {
+            contactModal.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                closeModal();
+            }
+        });
+        
+        // Gestion du formulaire
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phone').value;
+            const contactMethod = document.querySelector('input[name="contact-method"]:checked').value;
+            const message = document.getElementById('message').value;
+            
+            console.log('Demande de contact:');
+            console.log('Téléphone:', phone);
+            console.log('Méthode:', contactMethod);
+            console.log('Message:', message);
+            
+            closeModal();
+            showToast();
+            contactForm.reset();
+            document.querySelector('input[name="contact-method"][value="whatsapp"]').checked = true;
+        });
+        
+        // Gestion du toast de confirmation
+        const toast = document.getElementById('toast');
+        const closeToastBtn = document.getElementById('close-toast');
+        const toastProgress = document.getElementById('toast-progress');
+        
+        let toastTimeout;
+        let progressInterval;
+        
+        function showToast() {
+            clearTimeout(toastTimeout);
+            clearInterval(progressInterval);
+            
+            toast.classList.add('active');
+            
+            let width = 100;
+            toastProgress.style.width = '100%';
+            
+            progressInterval = setInterval(() => {
+                width -= 0.5;
+                toastProgress.style.width = width + '%';
+                
+                if (width <= 0) {
+                    clearInterval(progressInterval);
+                    hideToast();
+                }
+            }, 30);
+            
+            toastTimeout = setTimeout(hideToast, 5000);
+        }
+        
+        function hideToast() {
+            toast.classList.remove('active');
+            clearInterval(progressInterval);
+        }
+        
+        closeToastBtn.addEventListener('click', hideToast);
+        
+        toast.addEventListener('click', (e) => {
+            if (e.target === toast) {
+                hideToast();
+            }
+        });
+        
+        // Gestion du menu mobile
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        mobileMenuBtn.addEventListener('click', () => {
+            alert('Menu mobile - En développement');
+        });
+        
+        // Validation du numéro de téléphone
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 0) {
+                if (!value.startsWith('243')) {
+                    value = '243' + value;
+                }
+                
+                let formatted = '+' + value.substring(0, 3);
+                if (value.length > 3) {
+                    formatted += ' ' + value.substring(3, 5);
+                }
+                if (value.length > 5) {
+                    formatted += ' ' + value.substring(5, 8);
+                }
+                if (value.length > 8) {
+                    formatted += ' ' + value.substring(8, 12);
+                }
+                
+                this.value = formatted.substring(0, 16);
+            }
+        });
+    </script>
+</body>
+</html>

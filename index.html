@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace - Annonces en ligne</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .clip-description {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .pagination-btn {
+            transition: all 0.2s ease;
+        }
+        .pagination-btn:hover:not(.disabled) {
+            background-color: #1e40af;
+            color: white;
+        }
+        .pagination-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Animation pour le panneau des filtres */
+        .filters-panel {
+            transition: all 0.3s ease;
+        }
+        @media (max-width: 1023px) {
+            .filters-panel {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 85%;
+                height: 100%;
+                z-index: 50;
+                overflow-y: auto;
+            }
+            .filters-panel.active {
+                left: 0;
+            }
+            .filters-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            .filters-overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Section Header avec logo, barre de recherche et illustration -->
+    <header class="relative bg-gradient-to-r from-blue-900 to-blue-800 text-white overflow-hidden">
+        <!-- Illustration d'arrière-plan -->
+        <div class="absolute inset-0 z-0 opacity-20">
+            <div class="absolute top-0 right-0 w-1/2 h-full">
+                <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" class="text-blue-300 w-full h-full">
+                    <path fill="currentColor" d="M58.1,-74.5C73.8,-63.3,84.6,-42.9,87.4,-21.9C90.2,-0.9,85,20.6,74.9,40.3C64.7,59.9,49.6,77.7,31.2,85.3C12.8,92.9,-8.9,90.3,-28.4,82.4C-47.9,74.5,-65.2,61.4,-75.4,43.8C-85.6,26.2,-88.7,4.2,-84.6,-15.4C-80.5,-35,-69.2,-52.3,-53.3,-63.5C-37.5,-74.7,-18.7,-79.8,1.4,-81.4C21.6,-82.9,43.1,-85.8,58.1,-74.5Z" transform="translate(250 250)" />
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Navigation avec logo et barre de recherche -->
+        <div class="container mx-auto px-4 py-8 relative z-10">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 mb-6 md:mb-0">
+                    <div class="bg-white text-blue-900 p-2 rounded-lg">
+                        <i class="fas fa-store text-2xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold">MarketPlace</span>
+                </div>
+                
+                <!-- Barre de recherche centrée -->
+                <div class="w-full md:w-2/5">
+                    <div class="relative">
+                        <input type="text" placeholder="Rechercher une annonce..." class="w-full py-3 px-5 rounded-full text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-blue-700 hover:bg-blue-600 text-white p-2 rounded-full">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Liens utilisateur -->
+                <!-- <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="hover:text-blue-200"><i class="fas fa-user-circle mr-1"></i> Mon compte</a>
+                    <a href="#" class="bg-white text-blue-900 py-2 px-4 rounded-lg font-medium hover:bg-blue-50">Déposer une annonce</a>
+                </div> -->
+            </div>
+            
+            <!-- En-tête avec titre -->
+            <div class="text-center py-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">Trouvez ce que vous cherchez</h1>
+                <p class="text-xl text-blue-200 max-w-2xl mx-auto">Des milliers d'annonces de voitures, immobilier et bien plus. Filtrez, comparez et achetez en toute confiance.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Section principale avec filtres et grille d'annonces -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Bouton pour ouvrir les filtres sur mobile -->
+        <div class="lg:hidden mb-6">
+            <button id="open-filters-btn" class="flex items-center bg-blue-900 hover:bg-blue-800 text-white py-3 px-5 rounded-lg font-medium transition duration-300">
+                <i class="fas fa-filter mr-2"></i> Filtrer les annonces
+                <span id="filter-count" class="ml-2 bg-white text-blue-900 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">2</span>
+            </button>
+        </div>
+        
+        <div class="flex flex-col lg:flex-row lg:items-start gap-8">
+            <!-- Overlay pour fermer les filtres sur mobile -->
+            <div id="filters-overlay" class="filters-overlay"></div>
+            
+            <!-- Section filtres (à gauche) -->
+            <aside class="filters-panel lg:w-1/4 bg-white rounded-xl shadow-lg p-6 lg:sticky lg:top-8">
+                <!-- En-tête des filtres avec bouton de fermeture sur mobile -->
+                <div class="flex justify-between items-center mb-6 pb-2 border-b">
+                    <h2 class="text-xl font-bold text-blue-900">Filtrer les annonces</h2>
+                    <button id="close-filters-btn" class="lg:hidden text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Catégories -->
+                <div class="mb-5">
+                    <h3 class="font-semibold text-gray-700 mb-1">Catégories</h3>
+                    <div class="space-y-1">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500" checked>
+                            <span class="ml-2 text-gray-700">Voitures <span class="text-gray-500 text-sm">(42)</span></span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">Immobilier <span class="text-gray-500 text-sm">(28)</span></span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">Électronique <span class="text-gray-500 text-sm">(15)</span></span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">Mode <span class="text-gray-500 text-sm">(31)</span></span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-gray-700">Services <span class="text-gray-500 text-sm">(9)</span></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Prix -->
+                <div class="mb-5">
+                    <h3 class="font-semibold text-gray-700 mb-3">Prix</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                            <span class="ml-2 text-gray-700">Tous les prix</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                            <div class="flex flex-row items-center justify-around p-2">
+                                <input type="number" placeholder="0" class="w-[40%] p-1 border rounded">
+                                <span>-</span>
+                                <input type="number" placeholder="0" class="w-[40%] p-1 border rounded">
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Money -->
+                <div class="mb-2">
+                    <h3 class="font-semibold text-gray-700 mb-3">Devise</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                            <span class="ml-2 text-gray-700">USD ($)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                            <span class="ml-2 text-gray-700">FRANC (CDF)</span>
+                        </label>
+                    </div>
+                </div>
+                <button id="apply-filters" class="w-full bg-blue-900 hover:bg-blue-800 text-white py-3 px-4 rounded-lg font-medium transition duration-300">
+                    Appliquer les filtres
+                </button>
+                
+                <!-- Bouton pour réinitialiser les filtres -->
+                <button id="reset-filters" class="w-full mt-3 border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 px-4 rounded-lg font-medium transition duration-300">
+                    Réinitialiser
+                </button>
+            </aside>
+            
+            <!-- Section grille d'annonces (à droite) -->
+            <section class="lg:w-3/4">
+                <!-- En-tête de la section -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-900">Annonces récentes</h2>
+                    </div>
+                </div>
+                
+                <!-- Grille d'annonces - 5 lignes (15 items) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                    <!-- Annonce 1 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Toyota RAV4" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Toyota RAV4 2020</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">15,500 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Véhicule en excellent état, faible kilométrage, entretien à jour. Climatisation, GPS, caméra de recul.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 2 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 2 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Appartement moderne" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Appartement 3 chambres</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">950,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Bel appartement lumineux situé en centre-ville. 3 chambres, salle de bain moderne, cuisine équipée.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Goma</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 5 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 3 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Mercedes Classe C" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Mercedes Classe C 2019</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">28,000 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Voiture de luxe en parfait état, intérieur cuir, système audio premium, toutes options incluses.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Lubumbashi</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 1 semaine</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 4 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Maison moderne" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Villa avec jardin</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">1,500,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Belle villa de 4 chambres avec grand jardin et garage. Quartier résidentiel calme et sécurisé.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 3 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 5 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Audi Q5" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Audi Q5 2021</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">42,500 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">SUV premium, faible consommation, système de navigation, intérieur en cuir, garantie constructeur.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Goma</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 2 semaines</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 6 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Appartement centre-ville" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Studio meublé centre-ville</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">450,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Studio entièrement meublé, idéal pour étudiant ou jeune professionnel. Proche de toutes commodités.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Bukavu</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 1 jour</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 7 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Voiture d'occasion" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Peugeot 3008 2018</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">18,200 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">SUV familial spacieux, 7 places, bon état général, entretien régulier, prêt pour la route.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 4 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 8 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Maison de campagne" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Maison de campagne</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">2,100,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Charmante maison de campagne avec vue imprenable, 5 chambres, piscine et grand terrain.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Matadi</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 1 semaine</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 9 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="BMW Série 3" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">BMW Série 3 2020</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">35,800 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Berline sportive, moteur puissant, intérieur premium, toutes options, garantie jusqu'en 2024.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Lubumbashi</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 3 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 10 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Appartement luxe" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Appartement de luxe</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">3,500,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Appartement haut de gamme avec vue sur mer, 4 chambres, piscine privée, conciergerie 24/7.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 2 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 11 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Hyundai Tucson" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Hyundai Tucson 2021</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">22,300 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">SUV compact, économique, équipé des dernières technologies, idéal pour la ville et la route.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Goma</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 6 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 12 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Bureau professionnel" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Bureau professionnel</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">750,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Espace de bureau moderne au centre-ville, équipé, connexion internet fibre, salle de réunion incluse.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 5 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 13 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Renault Clio" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Voiture</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Renault Clio 2019</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">12,500 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Citadine économique en excellent état, faible consommation, entretien chez concessionnaire.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Bukavu</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 3 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 14 -->
+                    <a href="detail.html" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Terrain constructible" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full">Immobilier</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Terrain constructible 500m²</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">850,000 CDF</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Terrain plat dans zone résidentielle en développement, viabilisé, permis de construire obtenable.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Lubumbashi</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 1 semaine</span>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <!-- Annonce 15 -->
+                    <a href="detail.htmls" class="bg-white rounded-xl shadow-md overflow-hidden card-hover block h-full">
+                        <div class="relative h-40 bg-gray-200">
+                            <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="Moto Yamaha" class="w-full h-full object-cover">
+                            <span class="absolute top-3 left-3 bg-blue-900 text-white text-xs font-medium px-3 py-1 rounded-full">Moto</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-bold text-gray-800 truncate">Yamaha YZF-R3 2022</h3>
+                                <span class="text-blue-900 font-bold text-lg whitespace-nowrap ml-2">5,800 $</span>
+                            </div>
+                            <p class="text-gray-600 mb-3 clip-description text-sm">Moto sportive, faible kilométrage, entretien régulier, idéale pour ville et route, carte grise à jour.</p>
+                            <div class="flex justify-between text-xs text-gray-500">
+                                <span><i class="fas fa-map-marker-alt mr-1"></i> Kinshasa</span>
+                                <span><i class="far fa-clock mr-1"></i> Il y a 2 jours</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex justify-center items-center space-x-2 mb-12">
+                    <button class="pagination-btn disabled w-10 h-10 rounded-full border flex items-center justify-center">
+                        <i class="fas fa-chevron-left text-gray-400"></i>
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full bg-blue-900 text-white flex items-center justify-center font-medium">
+                        1
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        2
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        3
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        4
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        5
+                    </button>
+                    <span class="px-2">...</span>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        15
+                    </button>
+                    <button class="pagination-btn w-10 h-10 rounded-full border flex items-center justify-center hover:bg-blue-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white pt-10 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+                <!-- Logo et description -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="bg-white text-blue-900 p-2 rounded-lg">
+                            <i class="fas fa-store text-xl"></i>
+                        </div>
+                        <span class="text-2xl font-bold">MarketPlace</span>
+                    </div>
+                    <p class="text-blue-200 mb-6">La plateforme de confiance pour acheter et vendre des biens et services en République Démocratique du Congo.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="bg-blue-800 hover:bg-blue-700 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-blue-800 hover:bg-blue-700 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-blue-800 hover:bg-blue-700 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="bg-blue-800 hover:bg-blue-700 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Liens rapides -->
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Liens rapides</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Comment ça marche</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">À propos de nous</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Contactez-nous</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Carrières</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Catégories -->
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Catégories populaires</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Voitures et véhicules</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Immobilier</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Électronique</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Mode et beauté</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition">Services professionnels</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="text-xl font-bold mb-6">Contactez-nous</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt mt-1 mr-3 text-blue-300"></i>
+                            <span class="text-blue-200">123 Avenue de la Marketplace, Kinshasa, RDC</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-3 text-blue-300"></i>
+                            <span class="text-blue-200">+243 81 234 5678</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-3 text-blue-300"></i>
+                            <span class="text-blue-200">info@marketplace.cd</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Ligne de séparation -->
+            <div class="border-t border-blue-800 pt-6">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-blue-300 text-sm mb-4 md:mb-0">&copy; 2023 MarketPlace. Tous droits réservés.</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <a href="#" class="text-blue-300 hover:text-white text-sm">Conditions d'utilisation</a>
+                        <a href="#" class="text-blue-300 hover:text-white text-sm">Politique de confidentialité</a>
+                        <a href="#" class="text-blue-300 hover:text-white text-sm">Politique de cookies</a>
+                        <a href="#" class="text-blue-300 hover:text-white text-sm">Mentions légales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Gestion des filtres resizable sur mobile
+        const openFiltersBtn = document.getElementById('open-filters-btn');
+        const closeFiltersBtn = document.getElementById('close-filters-btn');
+        const filtersPanel = document.querySelector('.filters-panel');
+        const filtersOverlay = document.getElementById('filters-overlay');
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const resetFiltersBtn = document.getElementById('reset-filters');
+        const filterCount = document.getElementById('filter-count');
+        
+        // Ouvrir les filtres sur mobile
+        openFiltersBtn.addEventListener('click', () => {
+            filtersPanel.classList.add('active');
+            filtersOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Fermer les filtres sur mobile
+        const closeFilters = () => {
+            filtersPanel.classList.remove('active');
+            filtersOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+        
+        closeFiltersBtn.addEventListener('click', closeFilters);
+        filtersOverlay.addEventListener('click', closeFilters);
+        
+        // Compter les filtres actifs
+        function updateFilterCount() {
+            const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+            // On compte seulement les radios si ce n'est pas l'option par défaut
+            let radioCount = 0;
+            checkedRadios.forEach(radio => {
+                if (!radio.hasAttribute('checked')) radioCount = 1;
+            });
+            
+            const total = checkedBoxes.length + radioCount;
+            filterCount.textContent = total;
+        }
+        
+        // Appliquer les filtres
+        applyFiltersBtn.addEventListener('click', () => {
+            closeFilters();
+            alert('Filtres appliqués avec succès!');
+            updateFilterCount();
+        });
+        
+        // Réinitialiser les filtres
+        resetFiltersBtn.addEventListener('click', () => {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            // Réactiver les options par défaut
+            document.querySelector('input[type="checkbox"][checked]').checked = true;
+            document.querySelector('input[type="radio"][checked]').checked = true;
+            
+            updateFilterCount();
+            alert('Filtres réinitialisés!');
+        });
+        
+        // Mettre à jour le compteur quand les filtres changent
+        document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+            input.addEventListener('change', updateFilterCount);
+        });
+        
+        // Initialiser le compteur
+        updateFilterCount();
+        
+        // Script pour la pagination interactive
+        document.querySelectorAll('.pagination-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                if (!this.classList.contains('disabled')) {
+                    // Retirer l'état actif de tous les boutons
+                    document.querySelectorAll('.pagination-btn').forEach(btn => {
+                        btn.classList.remove('bg-blue-900', 'text-white');
+                        btn.classList.add('border', 'hover:bg-blue-50');
+                    });
+                    
+                    // Ajouter l'état actif au bouton cliqué
+                    if (!this.querySelector('i')) {
+                        this.classList.add('bg-blue-900', 'text-white');
+                        this.classList.remove('border', 'hover:bg-blue-50');
+                    }
+                    
+                    // Simuler le chargement de nouvelles annonces
+                    console.log(`Chargement de la page ${this.textContent.trim()}...`);
+                }
+            });
+        });
+        
+        // Script pour la barre de recherche
+        const searchInput = document.querySelector('input[type="text"]');
+        const searchButton = document.querySelector('button.bg-blue-700');
+        
+        searchButton.addEventListener('click', function() {
+            if (searchInput.value.trim() !== '') {
+                console.log(`Recherche pour: ${searchInput.value}`);
+                alert(`Recherche lancée pour: ${searchInput.value}`);
+            }
+        });
+        
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                if (searchInput.value.trim() !== '') {
+                    console.log(`Recherche pour: ${searchInput.value}`);
+                    alert(`Recherche lancée pour: ${searchInput.value}`);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditer l'article - Toyota RAV4 2020</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .gallery-thumb {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .gallery-thumb:hover {
+            transform: scale(1.05);
+        }
+        .gallery-thumb.active {
+            border: 3px solid #1e40af;
+            transform: scale(1.05);
+        }
+        /* Animation pour le modal */
+        .modal {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        /* Animation pour le toast */
+        .toast {
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .toast.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Style pour les champs de formulaire */
+        input, select, textarea {
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            width: 100%;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            ring: 2px;
+            ring-color: #1e40af;
+            border-color: #1e40af;
+        }
+        /* Style pour le dropzone */
+        .dropzone {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .dropzone.dragover {
+            border-color: #1e40af;
+            background-color: #eff6ff;
+        }
+        /* Animation pour les nouvelles images */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .new-image {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+        <div class="container mx-auto px-3 py-2">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <a href="#" class="flex items-center space-x-2">
+                        <div class="bg-white text-blue-900 p-1 rounded">
+                            <i class="fas fa-store text-lg"></i>
+                        </div>
+                        <span class="text-lg font-bold">MarketPlace</span>
+                    </a>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-home mr-1"></i> Accueil</a>
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-search mr-1"></i> Mes annonces</a>
+                    <a href="#" class="hover:text-blue-200 text-sm"><i class="fas fa-user-circle mr-1"></i> Mon compte</a>
+                </nav>
+                
+                <!-- Menu mobile -->
+                <button id="mobile-menu-btn" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-3 py-4 lg:w-[80%]">
+        <!-- Fil d'Ariane et actions -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+            <div class="text-xs text-gray-600 mb-2 md:mb-0">
+                <a href="#" class="hover:text-blue-700">Mes annonces</a> 
+                <span class="mx-1">/</span>
+                <a href="#" class="hover:text-blue-700">Toyota RAV4 2020</a>
+                <span class="mx-1">/</span>
+                <span class="text-gray-800 font-medium">Édition</span>
+            </div>
+            
+            <!-- Boutons d'action -->
+            <div class="flex space-x-2">
+                <a href="#" class="border border-gray-300 hover:bg-gray-50 text-gray-700 py-1 px-3 rounded text-sm font-medium transition duration-300">
+                    <i class="fas fa-eye mr-1"></i> Prévisualiser
+                </a>
+                <a href="#" class="border border-gray-300 hover:bg-gray-50 text-gray-700 py-1 px-3 rounded text-sm font-medium transition duration-300">
+                    <i class="fas fa-times mr-1"></i> Annuler
+                </a>
+            </div>
+        </div>
+        
+        <form id="edit-form" class="flex flex-col lg:flex-row gap-4">
+            <!-- Première section : Galerie d'images -->
+            <section class="lg:w-1/2">
+                <!-- Image principale -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mb-3">
+                    <div class="relative h-72 bg-gray-100">
+                        <img id="main-image" src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Toyota RAV4 2020 - Vue principale" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2">
+                            <select class="bg-blue-900 text-white text-xs font-medium px-2 py-1 rounded-full border-0 focus:ring-0">
+                                <option value="sale">À vendre</option>
+                                <option value="rent">À louer</option>
+                                <option value="exchange">Échange</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Galerie de miniatures -->
+                <div class="bg-white rounded-lg shadow p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-gray-700 text-sm">Galerie photos</h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-gray-500" id="image-count">6/12 images</span>
+                            <button type="button" id="open-upload-modal" class="text-blue-600 hover:text-blue-800 text-xs">
+                                <i class="fas fa-plus mr-1"></i> Ajouter
+                            </button>
+                        </div>
+                    </div>
+                    <div id="gallery-container" class="grid grid-cols-3 md:grid-cols-6 gap-2 mb-3">
+                        <!-- Miniature 1 (active) -->
+                        <div class="gallery-thumb active rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Vue principale">
+                            <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Vue principale" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                1
+                            </div>
+                        </div>
+                        
+                        <!-- Miniature 2 -->
+                        <div class="gallery-thumb rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Intérieur">
+                            <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Intérieur" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                2
+                            </div>
+                        </div>
+                        
+                        <!-- Miniature 3 -->
+                        <div class="gallery-thumb rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Tableau de bord">
+                            <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Tableau de bord" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                3
+                            </div>
+                        </div>
+                        
+                        <!-- Miniature 4 -->
+                        <div class="gallery-thumb rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Vue arrière">
+                            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wywYWNlZ2VfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Vue arrière" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                4
+                            </div>
+                        </div>
+                        
+                        <!-- Miniature 5 -->
+                        <div class="gallery-thumb rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Moteur">
+                            <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Moteur" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                5
+                            </div>
+                        </div>
+                        
+                        <!-- Miniature 6 -->
+                        <div class="gallery-thumb rounded overflow-hidden relative" data-image="https://images.unsplash.com/photo-1563720223484-21c6c2d3c6c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" data-alt="Toyota RAV4 2020 - Jantes">
+                            <img src="https://images.unsplash.com/photo-1563720223484-21c6c2d3c6c8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="Jantes" class="w-full h-16 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                6
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Légende de l'image -->
+                    <div class="mt-2">
+                        <input type="text" id="image-caption" value="Vue principale du Toyota RAV4 2020" 
+                               class="w-full text-xs text-gray-600 text-center border-0 focus:ring-0" placeholder="Légende de l'image">
+                    </div>
+                </div>
+                
+                <!-- Informations techniques -->
+                <div class="mt-4 bg-white rounded-lg shadow p-4">
+                    <h3 class="font-bold text-gray-700 mb-3 text-sm">Caractéristiques techniques</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Année</label>
+                            <input type="number" name="year" value="2020" class="py-1 text-sm" min="1990" max="2024">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Kilométrage</label>
+                            <input type="number" name="mileage" value="45000" class="py-1 text-sm">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Carburant</label>
+                            <select name="fuel" class="py-1 text-sm">
+                                <option value="essence" selected>Essence</option>
+                                <option value="diesel">Diesel</option>
+                                <option value="electrique">Électrique</option>
+                                <option value="hybride">Hybride</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Transmission</label>
+                            <select name="transmission" class="py-1 text-sm">
+                                <option value="automatique" selected>Automatique</option>
+                                <option value="manuelle">Manuelle</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Couleur</label>
+                            <input type="text" name="color" value="Gris métallisé" class="py-1 text-sm">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="text-gray-600 text-sm mb-1">Portes</label>
+                            <input type="number" name="doors" value="5" class="py-1 text-sm" min="2" max="6">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Deuxième section : Informations détaillées -->
+            <section class="lg:w-1/2">
+                <div class="bg-white rounded-lg shadow p-4 mb-4">
+                    <!-- En-tête avec titre et prix -->
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 pb-3 border-b">
+                        <div class="flex-1 mr-4">
+                            <div class="mb-2">
+                                <label class="block text-gray-700 font-medium mb-1 text-sm">Titre de l'annonce</label>
+                                <input type="text" name="title" value="Toyota RAV4 2020" 
+                                       class="text-xl md:text-2xl font-bold text-gray-800 border-0 focus:ring-0 p-0">
+                            </div>
+                            <div class="flex items-center text-gray-600 text-xs">
+                                <div class="mr-3">
+                                    <label class="block text-gray-600 text-xs mb-1">Ville</label>
+                                    <input type="text" name="city" value="Kinshasa" class="text-xs border-0 focus:ring-0 p-0">
+                                </div>
+                                <span class="mx-1">•</span>
+                                <div class="ml-3">
+                                    <label class="block text-gray-600 text-xs mb-1">Quartier</label>
+                                    <input type="text" name="district" value="Gombe" class="text-xs border-0 focus:ring-0 p-0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 md:mt-0">
+                            <div class="mb-2">
+                                <label class="block text-gray-700 text-sm mb-1">Prix</label>
+                                <div class="flex items-center">
+                                    <input type="number" name="price" value="15500" 
+                                           class="text-2xl font-bold text-blue-900 border-0 focus:ring-0 p-0 w-24">
+                                    <select name="currency" class="ml-2 border-0 focus:ring-0 p-0">
+                                        <option value="$" selected>$</option>
+                                        <option value="CDF">CDF</option>
+                                        <option value="€">€</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="negotiable" name="negotiable" checked class="h-4 w-4">
+                                <label for="negotiable" class="text-gray-600 text-sm ml-2">Prix négociable</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Catégories -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2 text-sm">Catégories</label>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="categories[]" value="voiture" checked class="h-4 w-4 text-blue-600">
+                                <span class="ml-1 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">Voiture</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="categories[]" value="suv" checked class="h-4 w-4 text-blue-600">
+                                <span class="ml-1 bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">SUV</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="categories[]" value="toyota" checked class="h-4 w-4 text-blue-600">
+                                <span class="ml-1 bg-purple-100 text-purple-800 text-xs font-medium px-2 py-1 rounded-full">Toyota</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="checkbox" name="categories[]" value="occasion" checked class="h-4 w-4 text-blue-600">
+                                <span class="ml-1 bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-1 rounded-full">Occasion</span>
+                            </label>
+                            <button type="button" class="text-blue-600 hover:text-blue-800 text-xs">
+                                <i class="fas fa-plus"></i> Ajouter
+                            </button>
+                        </div>
+                        
+                        <!-- État du produit -->
+                        <div class="bg-gray-50 rounded p-3">
+                            <label class="block text-gray-700 font-medium mb-2 text-sm">État du produit</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="condition" value="new" class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2 text-sm">Neuf</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="condition" value="used" checked class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2 text-sm">Occasion</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="condition" value="refurbished" class="h-4 w-4 text-blue-600">
+                                    <span class="ml-2 text-sm">Reconditionné</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-bold text-gray-700 text-sm">Description</h3>
+                            <span class="text-gray-500 text-xs" id="char-count">0/2000 caractères</span>
+                        </div>
+                        <textarea name="description" rows="8" 
+                                  class="w-full text-sm border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="Décrivez votre article en détail...">Je vends mon Toyota RAV4 2020 en excellent état. Le véhicule a été régulièrement entretenu chez le concessionnaire Toyota et n'a jamais eu d'accident.
+
+Ce SUV compact offre un confort de conduite exceptionnel et une consommation raisonnable pour sa catégorie. Idéal pour les familles ou les longs trajets.
+
+Équipements inclus :
+• Climatisation automatique bi-zone
+• Système de navigation GPS avec écran tactile 8"
+• Caméra de recul avec détecteurs de recul
+• Sièges en cuir chauffants
+• Système audio premium JBL
+• Toit panoramique ouvrant
+• Régulateur et limiteur de vitesse adaptatif
+• Aide au maintien dans la voie
+• Freinage d'urgence automatique
+
+Le véhicule est garanti jusqu'en décembre 2023. Carnet d'entretien complet disponible. Contrôle technique récent effectué (valable jusqu'en juin 2024).
+
+Disponible pour essai sur rendez-vous. Paiement possible en plusieurs moyens (cash, virement, financement possible).</textarea>
+                    </div>
+                    
+                    <!-- Informations de contact -->
+                    <div class="mb-4 bg-gray-50 rounded p-3">
+                        <h3 class="font-bold text-gray-700 mb-2 text-sm">Informations de contact</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-gray-600 text-xs mb-1">Nom</label>
+                                <input type="text" name="seller_name" value="Jean Kabasele" class="w-full text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-xs mb-1">Téléphone</label>
+                                <input type="tel" name="seller_phone" value="+243 81 234 5678" class="w-full text-sm">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-600 text-xs mb-1">Email (optionnel)</label>
+                                <input type="email" name="seller_email" value="jean@example.com" class="w-full text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Boutons de soumission -->
+                    <div class="flex flex-col md:flex-row gap-3 pt-4 border-t">
+                        <button type="button" class="w-full md:w-1/3 border border-red-300 hover:bg-red-50 text-red-700 py-2 rounded text-sm font-medium transition duration-300">
+                            <i class="fas fa-trash mr-1"></i> Supprimer l'annonce
+                        </button>
+                        <button type="button" class="w-full md:w-1/3 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 rounded text-sm font-medium transition duration-300">
+                            <i class="fas fa-eye-slash mr-1"></i> Masquer l'annonce
+                        </button>
+                        <button type="submit" class="w-full md:w-1/3 bg-blue-900 hover:bg-blue-800 text-white py-2 rounded text-sm font-bold transition duration-300">
+                            <i class="fas fa-save mr-1"></i> Enregistrer les modifications
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white pt-6 pb-4 mt-6">
+        <div class="container mx-auto px-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Logo et description -->
+                <div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="bg-white text-blue-900 p-1 rounded">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <span class="text-lg font-bold">MarketPlace</span>
+                    </div>
+                    <p class="text-blue-200 mb-4 text-sm">La plateforme de confiance pour acheter et vendre des biens et services en RDC.</p>
+                </div>
+                
+                <!-- Liens rapides -->
+                <div>
+                    <h3 class="font-bold mb-3 text-sm">Liens rapides</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-sm">Accueil</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-sm">À propos de nous</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-sm">Contactez-nous</a></li>
+                        <li><a href="#" class="text-blue-200 hover:text-white transition text-sm">Conditions d'utilisation</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Contact -->
+                <div>
+                    <h3 class="font-bold mb-3 text-sm">Contactez-nous</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-blue-300 text-sm"></i>
+                            <span class="text-blue-200 text-sm">+243 81 234 5678</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-blue-300 text-sm"></i>
+                            <span class="text-blue-200 text-sm">info@marketplace.cd</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Ligne de séparation -->
+            <div class="border-t border-blue-800 pt-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-blue-300 text-xs mb-3 md:mb-0">&copy; 2023 MarketPlace. Tous droits réservés.</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="text-blue-300 hover:text-white text-xs">Politique de confidentialité</a>
+                        <a href="#" class="text-blue-300 hover:text-white text-xs">Mentions légales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal d'upload d'images -->
+    <div id="upload-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-2">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="modal-content relative bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <!-- En-tête du modal -->
+            <div class="bg-blue-900 text-white rounded-t-xl p-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold">Ajouter des images</h3>
+                    <button id="close-upload-modal" class="text-white hover:text-blue-200 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <p class="text-blue-200 text-sm mt-1">Ajoutez jusqu'à 12 images (max 5MB par image)</p>
+            </div>
+            
+            <!-- Contenu du modal -->
+            <div class="p-4">
+                <!-- Zone de drag & drop -->
+                <div id="dropzone" class="dropzone p-8 text-center mb-4">
+                    <div class="mb-4">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-2"></i>
+                        <p class="text-gray-700 font-medium">Glissez-déposez vos images ici</p>
+                        <p class="text-gray-500 text-sm">ou</p>
+                    </div>
+                    <div class="relative">
+                        <input type="file" id="file-input" multiple accept="image/*" 
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        <button type="button" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded font-medium">
+                            <i class="fas fa-folder-open mr-2"></i> Parcourir les fichiers
+                        </button>
+                    </div>
+                    <p class="text-gray-500 text-xs mt-4">Formats acceptés: JPG, PNG, GIF, WebP (max 5MB)</p>
+                </div>
+                
+                <!-- Liste des fichiers sélectionnés -->
+                <div id="file-list" class="mb-4 hidden">
+                    <h4 class="font-medium text-gray-700 mb-2">Fichiers sélectionnés</h4>
+                    <div id="selected-files" class="space-y-2 max-h-40 overflow-y-auto"></div>
+                </div>
+                
+                <!-- Options d'upload -->
+                <div class="mb-6">
+                    <h4 class="font-medium text-gray-700 mb-2">Options</h4>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" id="auto-caption" checked class="h-4 w-4 text-blue-600">
+                        <label for="auto-caption" class="ml-2 text-gray-700 text-sm">
+                            Générer automatiquement les légendes
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="optimize-images" checked class="h-4 w-4 text-blue-600">
+                        <label for="optimize-images" class="ml-2 text-gray-700 text-sm">
+                            Optimiser automatiquement les images
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Boutons d'action -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                    <button type="button" id="cancel-upload" class="w-full sm:w-1/3 border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-3 rounded font-medium text-sm transition duration-300">
+                        Annuler
+                    </button>
+                    <button type="button" id="upload-images" class="w-full sm:w-2/3 bg-blue-900 hover:bg-blue-800 text-white py-2 px-3 rounded font-medium text-sm transition duration-300">
+                        <i class="fas fa-upload mr-1"></i> Ajouter les images
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de confirmation -->
+    <div id="toast" class="toast fixed top-4 right-4 z-50">
+        <div class="bg-green-500 text-white rounded-lg shadow-xl p-4 max-w-sm">
+            <div class="flex items-center">
+                <div class="bg-green-600 rounded-full p-2 mr-3">
+                    <i class="fas fa-check text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold">Modifications enregistrées !</h4>
+                    <p class="text-sm text-green-100">Votre annonce a été mise à jour avec succès.</p>
+                </div>
+                <button id="close-toast" class="ml-4 text-white hover:text-green-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Barre de progression -->
+            <div class="mt-2 h-1 bg-green-400 rounded-full overflow-hidden">
+                <div id="toast-progress" class="h-full bg-green-300"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Galerie d'images améliorée
+        let galleryImages = [
+            { src: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341', alt: 'Toyota RAV4 2020 - Vue principale' },
+            { src: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d', alt: 'Toyota RAV4 2020 - Intérieur' },
+            { src: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8', alt: 'Toyota RAV4 2020 - Tableau de bord' },
+            { src: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70', alt: 'Toyota RAV4 2020 - Vue arrière' },
+            { src: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537', alt: 'Toyota RAV4 2020 - Moteur' },
+            { src: 'https://images.unsplash.com/photo-1563720223484-21c6c2d3c6c8', alt: 'Toyota RAV4 2020 - Jantes' }
+        ];
+
+        // Gestion de la galerie d'images
+        function updateGallery() {
+            const galleryContainer = document.getElementById('gallery-container');
+            const imageCount = document.getElementById('image-count');
+            
+            // Mettre à jour le compteur
+            imageCount.textContent = `${galleryImages.length}/12 images`;
+            
+            // Rendre le bouton "Ajouter" désactivé si on a atteint la limite
+            const addButton = document.getElementById('open-upload-modal');
+            if (galleryImages.length >= 12) {
+                addButton.disabled = true;
+                addButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                addButton.disabled = false;
+                addButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function renderGallery() {
+            const galleryContainer = document.getElementById('gallery-container');
+            galleryContainer.innerHTML = '';
+            
+            galleryImages.forEach((image, index) => {
+                const thumb = document.createElement('div');
+                thumb.className = `gallery-thumb rounded overflow-hidden relative ${index === 0 ? 'active' : ''}`;
+                thumb.setAttribute('data-image', `${image.src}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80`);
+                thumb.setAttribute('data-alt', image.alt);
+                
+                thumb.innerHTML = `
+                    <img src="${image.src}?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" 
+                         alt="${image.alt}" class="w-full h-16 object-cover">
+                    <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                        <button type="button" class="remove-image-btn bg-red-500 text-white text-xs p-1 rounded-full hover:bg-red-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="absolute top-1 left-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        ${index + 1}
+                    </div>
+                `;
+                
+                // Gestion du clic sur la miniature
+                thumb.addEventListener('click', function(e) {
+                    if (!e.target.closest('.remove-image-btn')) {
+                        const imageUrl = this.getAttribute('data-image');
+                        const imageAlt = this.getAttribute('data-alt');
+                        
+                        const mainImage = document.getElementById('main-image');
+                        mainImage.src = imageUrl;
+                        mainImage.alt = imageAlt;
+                        
+                        document.getElementById('image-caption').value = imageAlt;
+                        
+                        document.querySelectorAll('.gallery-thumb').forEach(t => {
+                            t.classList.remove('active');
+                        });
+                        
+                        this.classList.add('active');
+                    }
+                });
+                
+                // Gestion de la suppression
+                const removeBtn = thumb.querySelector('.remove-image-btn');
+                removeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    if (galleryImages.length > 1) {
+                        if (confirm("Supprimer cette image ?")) {
+                            const index = Array.from(galleryContainer.children).indexOf(thumb);
+                            galleryImages.splice(index, 1);
+                            renderGallery();
+                            updateGallery();
+                        }
+                    } else {
+                        alert("Vous devez garder au moins une image dans la galerie.");
+                    }
+                });
+                
+                galleryContainer.appendChild(thumb);
+            });
+            
+            updateGallery();
+        }
+
+        // Modal d'upload d'images
+        const uploadModal = document.getElementById('upload-modal');
+        const openUploadModalBtn = document.getElementById('open-upload-modal');
+        const closeUploadModalBtn = document.getElementById('close-upload-modal');
+        const cancelUploadBtn = document.getElementById('cancel-upload');
+        const uploadImagesBtn = document.getElementById('upload-images');
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const selectedFilesContainer = document.getElementById('selected-files');
+        const fileListContainer = document.getElementById('file-list');
+        
+        let selectedFiles = [];
+
+        // Ouvrir le modal d'upload
+        openUploadModalBtn.addEventListener('click', () => {
+            uploadModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Fermer le modal d'upload
+        function closeUploadModal() {
+            uploadModal.classList.remove('active');
+            document.body.style.overflow = '';
+            selectedFiles = [];
+            selectedFilesContainer.innerHTML = '';
+            fileListContainer.classList.add('hidden');
+        }
+
+        closeUploadModalBtn.addEventListener('click', closeUploadModal);
+        cancelUploadBtn.addEventListener('click', closeUploadModal);
+
+        // Fermer le modal en cliquant en dehors
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) {
+                closeUploadModal();
+            }
+        });
+
+        // Gestion du drag & drop
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropzone.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            dropzone.classList.remove('dragover');
+        }
+
+        // Gestion du drop
+        dropzone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        // Gestion de la sélection de fichiers
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            const remainingSlots = 12 - galleryImages.length;
+            const filesArray = Array.from(files).slice(0, remainingSlots);
+            
+            if (filesArray.length === 0) {
+                alert(`Vous ne pouvez ajouter que ${remainingSlots} image(s) maximum.`);
+                return;
+            }
+            
+            selectedFiles = filesArray;
+            renderSelectedFiles();
+        }
+
+        function renderSelectedFiles() {
+            selectedFilesContainer.innerHTML = '';
+            
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-2 border rounded';
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    fileItem.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${e.target.result}" class="w-10 h-10 object-cover rounded mr-3" alt="Aperçu">
+                            <div>
+                                <p class="text-sm font-medium truncate max-w-xs">${file.name}</p>
+                                <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            </div>
+                        </div>
+                        <button type="button" class="remove-file-btn text-red-500 hover:text-red-700" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    // Gestion de la suppression d'un fichier sélectionné
+                    const removeBtn = fileItem.querySelector('.remove-file-btn');
+                    removeBtn.addEventListener('click', function() {
+                        const idx = parseInt(this.getAttribute('data-index'));
+                        selectedFiles.splice(idx, 1);
+                        renderSelectedFiles();
+                    });
+                };
+                reader.readAsDataURL(file);
+                
+                selectedFilesContainer.appendChild(fileItem);
+            });
+            
+            fileListContainer.classList.remove('hidden');
+        }
+
+        // Upload des images
+        uploadImagesBtn.addEventListener('click', function() {
+            if (selectedFiles.length === 0) {
+                alert('Veuillez sélectionner au moins une image.');
+                return;
+            }
+            
+            // Simulation d'upload
+            uploadImagesBtn.disabled = true;
+            uploadImagesBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Upload en cours...';
+            
+            // Simuler un upload avec une progression
+            let uploadedCount = 0;
+            
+            selectedFiles.forEach((file, index) => {
+                // Simuler un délai d'upload
+                setTimeout(() => {
+                    // Générer une URL d'image Unsplash aléatoire pour la simulation
+                    const unsplashUrls = [
+                        'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7',
+                        'https://images.unsplash.com/photo-1503376780353-7e6692767b70',
+                        'https://images.unsplash.com/photo-1553440569-bcc63803a83d',
+                        'https://images.unsplash.com/photo-1552519507-da3b142c6e3d',
+                        'https://images.unsplash.com/photo-1555212697-194d092e3b8f'
+                    ];
+                    
+                    const randomUrl = unsplashUrls[Math.floor(Math.random() * unsplashUrls.length)];
+                    const autoCaption = document.getElementById('auto-caption').checked;
+                    
+                    const newImage = {
+                        src: randomUrl,
+                        alt: autoCaption ? `Image ${galleryImages.length + 1} - ${file.name.split('.')[0]}` : `Image ${galleryImages.length + 1}`
+                    };
+                    
+                    galleryImages.push(newImage);
+                    uploadedCount++;
+                    
+                    if (uploadedCount === selectedFiles.length) {
+                        // Upload terminé
+                        renderGallery();
+                        closeUploadModal();
+                        uploadImagesBtn.disabled = false;
+                        uploadImagesBtn.innerHTML = '<i class="fas fa-upload mr-1"></i> Ajouter les images';
+                        
+                        // Afficher un message de succès
+                        showToast(`✅ ${selectedFiles.length} image(s) ajoutée(s) avec succès !`);
+                    }
+                }, index * 300); // Délai simulé entre chaque upload
+            });
+        });
+
+        // Initialisation de la galerie
+        renderGallery();
+
+        // Compteur de caractères pour la description
+        const descriptionTextarea = document.querySelector('textarea[name="description"]');
+        const charCount = document.getElementById('char-count');
+        
+        function updateCharCount() {
+            const count = descriptionTextarea.value.length;
+            charCount.textContent = `${count}/2000 caractères`;
+            
+            if (count > 2000) {
+                charCount.classList.add('text-red-500');
+            } else {
+                charCount.classList.remove('text-red-500');
+            }
+        }
+        
+        descriptionTextarea.addEventListener('input', updateCharCount);
+        updateCharCount(); // Initialiser
+        
+        // Gestion du formulaire
+        const editForm = document.getElementById('edit-form');
+        
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Récupérer les données du formulaire
+            const formData = new FormData(editForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            console.log('Données du formulaire:', data);
+            console.log('Images de la galerie:', galleryImages);
+            
+            // Simuler l'envoi des données
+            setTimeout(() => {
+                showToast('Modifications enregistrées avec succès !');
+            }, 500);
+        });
+        
+        // Gestion du toast de confirmation
+        const toast = document.getElementById('toast');
+        const closeToastBtn = document.getElementById('close-toast');
+        const toastProgress = document.getElementById('toast-progress');
+        
+        let toastTimeout;
+        let progressInterval;
+        
+        function showToast(message = 'Modifications enregistrées !') {
+            clearTimeout(toastTimeout);
+            clearInterval(progressInterval);
+            
+            // Mettre à jour le message si fourni
+            if (message) {
+                toast.querySelector('h4').textContent = message.split('!')[0] + '!';
+                if (message.split('!')[1]) {
+                    toast.querySelector('p').textContent = message.split('!')[1].trim();
+                }
+            }
+            
+            toast.classList.add('active');
+            
+            let width = 100;
+            toastProgress.style.width = '100%';
+            
+            progressInterval = setInterval(() => {
+                width -= 0.5;
+                toastProgress.style.width = width + '%';
+                
+                if (width <= 0) {
+                    clearInterval(progressInterval);
+                    hideToast();
+                }
+            }, 30);
+            
+            toastTimeout = setTimeout(hideToast, 4000);
+        }
+        
+        function hideToast() {
+            toast.classList.remove('active');
+            clearInterval(progressInterval);
+        }
+        
+        closeToastBtn.addEventListener('click', hideToast);
+        
+        toast.addEventListener('click', (e) => {
+            if (e.target === toast) {
+                hideToast();
+            }
+        });
+        
+        // Gestion du menu mobile
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            alert('Menu mobile - En développement');
+        });
+        
+        // Validation du numéro de téléphone
+        const phoneInput = document.querySelector('input[name="seller_phone"]');
+        
+        phoneInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            
+            if (value.length > 0) {
+                if (!value.startsWith('243')) {
+                    value = '243' + value;
+                }
+                
+                let formatted = '+' + value.substring(0, 3);
+                if (value.length > 3) {
+                    formatted += ' ' + value.substring(3, 5);
+                }
+                if (value.length > 5) {
+                    formatted += ' ' + value.substring(5, 8);
+                }
+                if (value.length > 8) {
+                    formatted += ' ' + value.substring(8, 12);
+                }
+                
+                this.value = formatted.substring(0, 16);
+            }
+        });
+        
+        // Gestion de l'ajout de catégories
+        const addCategoryBtn = document.querySelector('button[type="button"]:has(.fa-plus)');
+        const categoryContainer = addCategoryBtn?.previousElementSibling;
+        
+        if (addCategoryBtn && categoryContainer) {
+            addCategoryBtn.addEventListener('click', () => {
+                const newCategory = prompt('Entrez le nom de la nouvelle catégorie:');
+                if (newCategory && newCategory.trim()) {
+                    const randomColors = [
+                        'bg-red-100 text-red-800',
+                        'bg-blue-100 text-blue-800', 
+                        'bg-green-100 text-green-800',
+                        'bg-yellow-100 text-yellow-800',
+                        'bg-purple-100 text-purple-800',
+                        'bg-pink-100 text-pink-800',
+                        'bg-indigo-100 text-indigo-800'
+                    ];
+                    const randomColor = randomColors[Math.floor(Math.random() * randomColors.length)];
+                    
+                    const newLabel = document.createElement('label');
+                    newLabel.className = 'inline-flex items-center';
+                    newLabel.innerHTML = `
+                        <input type="checkbox" name="categories[]" value="${newCategory.toLowerCase()}" class="h-4 w-4 text-blue-600" checked>
+                        <span class="ml-1 ${randomColor} text-xs font-medium px-2 py-1 rounded-full">${newCategory}</span>
+                    `;
+                    
+                    categoryContainer.insertBefore(newLabel, addCategoryBtn);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

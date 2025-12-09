@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestion des annonces</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+        .sidebar-link:hover {
+            background-color: #eff6ff;
+            transform: translateX(5px);
+        }
+        .sidebar-link.active {
+            background-color: #1e40af;
+            color: white;
+        }
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        .table-row:hover {
+            background-color: #f8fafc;
+        }
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        /* Animation pour le modal */
+        .modal {
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 to-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white text-blue-900 p-2 rounded-lg">
+                        <i class="fas fa-store text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">MarketPlace</h1>
+                        <p class="text-blue-200 text-xs">Tableau de bord administrateur</p>
+                    </div>
+                </div>
+                
+                <!-- Utilisateur et notifications -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button id="notification-btn" class="relative hover:text-blue-200">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Profil utilisateur -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div class="hidden md:block">
+                            <p class="text-sm font-medium">Admin MarketPlace</p>
+                            <p class="text-blue-200 text-xs">Administrateur</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar Navigation -->
+        <aside class="hidden md:flex flex-col w-64 bg-white shadow-lg min-h-[calc(100vh-76px)]">
+            <!-- Menu principal -->
+            <nav class="flex-1 p-4">
+                <h3 class="font-bold text-gray-700 mb-4 text-sm uppercase tracking-wider">Navigation</h3>
+                <ul class="space-y-1">
+                    <li>
+                        <a href="#" class="sidebar-link active flex items-center p-3 rounded-lg">
+                            <i class="fas fa-bullhorn mr-3"></i>
+                            <span>Annonces</span>
+                            <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">42</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                            <i class="fas fa-comments mr-3"></i>
+                            <span>Messages</span>
+                            <span class="ml-auto bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">12</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                            <i class="fas fa-chart-bar mr-3"></i>
+                            <span>Statistiques</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                            <i class="fas fa-users mr-3"></i>
+                            <span>Utilisateurs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                            <i class="fas fa-cog mr-3"></i>
+                            <span>Paramètres</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <!-- Liens rapides -->
+                <div class="mt-8">
+                    <h3 class="font-bold text-gray-700 mb-4 text-sm uppercase tracking-wider">Actions rapides</h3>
+                    <ul class="space-y-1">
+                        <li>
+                            <a href="#" class="sidebar-link flex items-center p-3 rounded-lg bg-blue-50 text-blue-700 border border-blue-100">
+                                <i class="fas fa-plus-circle mr-3"></i>
+                                <span>Créer une annonce</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                                <i class="fas fa-tags mr-3"></i>
+                                <span>Gérer les catégories</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="sidebar-link flex items-center p-3 rounded-lg">
+                                <i class="fas fa-file-export mr-3"></i>
+                                <span>Exporter les données</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <!-- Footer sidebar -->
+            <div class="p-4 border-t">
+                <a href="#" class="flex items-center p-2 text-gray-600 hover:text-blue-700">
+                    <i class="fas fa-sign-out-alt mr-2"></i>
+                    <span class="text-sm">Déconnexion</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Contenu principal -->
+        <main class="flex-1 p-4 md:p-6">
+            <!-- En-tête avec statistiques -->
+            <div class="mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-800">Tableau de bord</h2>
+                        <p class="text-gray-600">Gérez vos annonces et suivez vos statistiques</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        <button class="bg-blue-900 hover:bg-blue-800 text-white py-2 px-4 rounded-lg font-medium transition duration-300">
+                            <i class="fas fa-plus mr-2"></i> Nouvelle annonce
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Statistiques -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Total annonces</p>
+                                <p class="text-2xl font-bold text-gray-800">42</p>
+                            </div>
+                            <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
+                                <i class="fas fa-bullhorn"></i>
+                            </div>
+                        </div>
+                        <p class="text-green-600 text-sm mt-2">
+                            <i class="fas fa-arrow-up mr-1"></i> 12% ce mois
+                        </p>
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Annonces actives</p>
+                                <p class="text-2xl font-bold text-gray-800">35</p>
+                            </div>
+                            <div class="bg-green-100 text-green-600 p-2 rounded-lg">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <p class="text-green-600 text-sm mt-2">
+                            <i class="fas fa-arrow-up mr-1"></i> 8% ce mois
+                        </p>
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">En attente</p>
+                                <p class="text-2xl font-bold text-gray-800">5</p>
+                            </div>
+                            <div class="bg-yellow-100 text-yellow-600 p-2 rounded-lg">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                        <p class="text-red-600 text-sm mt-2">
+                            <i class="fas fa-arrow-down mr-1"></i> 3% ce mois
+                        </p>
+                    </div>
+                    
+                    <div class="stat-card bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-500 text-sm">Vues totales</p>
+                                <p class="text-2xl font-bold text-gray-800">2,458</p>
+                            </div>
+                            <div class="bg-purple-100 text-purple-600 p-2 rounded-lg">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                        </div>
+                        <p class="text-green-600 text-sm mt-2">
+                            <i class="fas fa-arrow-up mr-1"></i> 24% ce mois
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section filtres et recherche -->
+            <div class="bg-white rounded-lg shadow p-4 mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <!-- Barre de recherche -->
+                    <div class="flex-1">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input type="text" placeholder="Rechercher une annonce..." 
+                                   class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <!-- Filtres -->
+                    <div class="flex flex-wrap gap-3">
+                        <!-- Catégorie -->
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="">Toutes catégories</option>
+                            <option value="voiture">Voitures</option>
+                            <option value="immobilier">Immobilier</option>
+                            <option value="electronique">Électronique</option>
+                            <option value="mode">Mode</option>
+                            <option value="services">Services</option>
+                        </select>
+                        
+                        <!-- Statut -->
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="">Tous statuts</option>
+                            <option value="active">Actif</option>
+                            <option value="pending">En attente</option>
+                            <option value="inactive">Inactif</option>
+                            <option value="sold">Vendu</option>
+                        </select>
+                        
+                        <!-- Date -->
+                        <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="">Toutes dates</option>
+                            <option value="today">Aujourd'hui</option>
+                            <option value="week">Cette semaine</option>
+                            <option value="month">Ce mois</option>
+                            <option value="year">Cette année</option>
+                        </select>
+                        
+                        <!-- Bouton appliquer -->
+                        <button class="bg-blue-900 hover:bg-blue-800 text-white px-4 py-2 rounded-lg font-medium text-sm transition duration-300">
+                            Appliquer
+                        </button>
+                        
+                        <!-- Bouton réinitialiser -->
+                        <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-medium text-sm transition duration-300">
+                            Réinitialiser
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col lg:flex-row gap-6">
+                <!-- Section principale : Tableau des annonces -->
+                <section class="lg:w-2/3">
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <!-- En-tête du tableau -->
+                        <div class="px-4 py-3 border-b flex justify-between items-center">
+                            <h3 class="font-bold text-gray-700">Liste des annonces</h3>
+                            <div class="flex items-center space-x-2">
+                                <button class="text-gray-600 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-sync-alt mr-1"></i> Actualiser
+                                </button>
+                                <button class="text-gray-600 hover:text-blue-700 text-sm">
+                                    <i class="fas fa-download mr-1"></i> Exporter
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Tableau -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N°</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titre</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <!-- Ligne 1 -->
+                                    <tr class="table-row">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">1</td>
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                                <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                                     alt="Toyota RAV4" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Toyota RAV4 2020</p>
+                                                <p class="text-xs text-gray-500">ID: AN-001</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <p class="text-sm font-bold text-blue-900">15,500 $</p>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Voiture</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Actif</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">15/03/2023</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex space-x-2">
+                                                <button class="action-btn text-blue-600 hover:text-blue-800" title="Désactiver">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                                <button class="action-btn text-yellow-600 hover:text-yellow-800" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn text-red-600 hover:text-red-800" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Ligne 2 -->
+                                    <tr class="table-row">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">2</td>
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                                <img src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                                     alt="Appartement" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Appartement 3 chambres</p>
+                                                <p class="text-xs text-gray-500">ID: AN-002</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <p class="text-sm font-bold text-blue-900">950,000 CDF</p>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Immobilier</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded-full">En attente</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">12/03/2023</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex space-x-2">
+                                                <button class="action-btn text-blue-600 hover:text-blue-800" title="Activer">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn text-yellow-600 hover:text-yellow-800" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn text-red-600 hover:text-red-800" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Ligne 3 -->
+                                    <tr class="table-row">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">3</td>
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                                <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                                     alt="Mercedes" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Mercedes Classe C 2019</p>
+                                                <p class="text-xs text-gray-500">ID: AN-003</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <p class="text-sm font-bold text-blue-900">28,000 $</p>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Voiture</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Actif</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">10/03/2023</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex space-x-2">
+                                                <button class="action-btn text-blue-600 hover:text-blue-800" title="Désactiver">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                                <button class="action-btn text-yellow-600 hover:text-yellow-800" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn text-red-600 hover:text-red-800" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Ligne 4 -->
+                                    <tr class="table-row">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">4</td>
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                                <img src="https://images.unsplash.com/photo-1568605114967-8130f3a36994?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                                     alt="Villa" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Villa avec jardin</p>
+                                                <p class="text-xs text-gray-500">ID: AN-004</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <p class="text-sm font-bold text-blue-900">1,500,000 CDF</p>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Immobilier</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">Vendu</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">05/03/2023</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex space-x-2">
+                                                <button class="action-btn text-gray-400 cursor-not-allowed" title="Désactivé">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                                <button class="action-btn text-yellow-600 hover:text-yellow-800" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn text-red-600 hover:text-red-800" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    
+                                    <!-- Ligne 5 -->
+                                    <tr class="table-row">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">5</td>
+                                        <td class="px-4 py-3">
+                                            <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden">
+                                                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                                     alt="Audi" class="w-full h-full object-cover">
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <div>
+                                                <p class="text-sm font-medium text-gray-900">Audi Q5 2021</p>
+                                                <p class="text-xs text-gray-500">ID: AN-005</p>
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <p class="text-sm font-bold text-blue-900">42,500 $</p>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">Voiture</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full">Inactif</span>
+                                        </td>
+                                        <td class="px-4 py-3 text-sm text-gray-500">28/02/2023</td>
+                                        <td class="px-4 py-3">
+                                            <div class="flex space-x-2">
+                                                <button class="action-btn text-blue-600 hover:text-blue-800" title="Activer">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="action-btn text-yellow-600 hover:text-yellow-800" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="action-btn text-red-600 hover:text-red-800" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="px-4 py-3 border-t flex flex-col sm:flex-row justify-between items-center">
+                            <div class="text-sm text-gray-700 mb-3 sm:mb-0">
+                                Affichage de <span class="font-medium">1</span> à <span class="font-medium">5</span> sur <span class="font-medium">42</span> annonces
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <button class="p-2 rounded-lg border hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    <i class="fas fa-chevron-left text-sm"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-lg bg-blue-900 text-white font-medium">1</button>
+                                <button class="w-10 h-10 rounded-lg border hover:bg-gray-50 font-medium">2</button>
+                                <button class="w-10 h-10 rounded-lg border hover:bg-gray-50 font-medium">3</button>
+                                <button class="w-10 h-10 rounded-lg border hover:bg-gray-50 font-medium">4</button>
+                                <span class="px-2">...</span>
+                                <button class="w-10 h-10 rounded-lg border hover:bg-gray-50 font-medium">9</button>
+                                <button class="p-2 rounded-lg border hover:bg-gray-50">
+                                    <i class="fas fa-chevron-right text-sm"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Section latérale : Liens verticaux -->
+                <aside class="lg:w-1/3">
+                    <!-- Cartes d'actions rapides -->
+                    <div class="bg-white rounded-lg shadow mb-6">
+                        <div class="px-4 py-3 border-b">
+                            <h3 class="font-bold text-gray-700">Actions rapides</h3>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <a href="#" class="flex items-center p-3 bg-blue-50 text-blue-700 rounded-lg border border-blue-100 hover:bg-blue-100 transition">
+                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Créer une annonce</p>
+                                    <p class="text-xs text-blue-600">Ajouter une nouvelle annonce</p>
+                                </div>
+                                <i class="fas fa-arrow-right ml-auto text-blue-400"></i>
+                            </a>
+                            
+                            <a href="#" class="flex items-center p-3 bg-purple-50 text-purple-700 rounded-lg border border-purple-100 hover:bg-purple-100 transition">
+                                <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-tags"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Gérer les catégories</p>
+                                    <p class="text-xs text-purple-600">Ajouter/modifier des catégories</p>
+                                </div>
+                                <i class="fas fa-arrow-right ml-auto text-purple-400"></i>
+                            </a>
+                            
+                            <a href="#" class="flex items-center p-3 bg-green-50 text-green-700 rounded-lg border border-green-100 hover:bg-green-100 transition">
+                                <div class="w-10 h-10 bg-green-100 text-green-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div>
+                                    <p class="font-medium">Voir les statistiques</p>
+                                    <p class="text-xs text-green-600">Analyser les performances</p>
+                                </div>
+                                <i class="fas fa-arrow-right ml-auto text-green-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Annonces récentes -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-4 py-3 border-b">
+                            <h3 class="font-bold text-gray-700">Annonces récentes</h3>
+                        </div>
+                        <div class="p-4 space-y-4">
+                            <!-- Annonce 1 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                         alt="Studio" class="w-full h-full object-cover">
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Studio meublé centre-ville</p>
+                                    <p class="text-xs text-gray-500">Immobilier • 450,000 CDF</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Il y a 1h</span>
+                            </div>
+                            
+                            <!-- Annonce 2 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                         alt="Voiture" class="w-full h-full object-cover">
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Peugeot 3008 2018</p>
+                                    <p class="text-xs text-gray-500">Voiture • 18,200 $</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Il y a 3h</span>
+                            </div>
+                            
+                            <!-- Annonce 3 -->
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" 
+                                         alt="Maison" class="w-full h-full object-cover">
+                                </div>
+                                <div class="ml-3 flex-1">
+                                    <p class="text-sm font-medium text-gray-900">Maison de campagne</p>
+                                    <p class="text-xs text-gray-500">Immobilier • 2,100,000 CDF</p>
+                                </div>
+                                <span class="text-xs text-gray-500">Il y a 5h</span>
+                            </div>
+                        </div>
+                        <div class="px-4 py-3 border-t text-center">
+                            <a href="#" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Voir toutes les annonces <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de confirmation de suppression -->
+    <div id="delete-modal" class="modal fixed inset-0 z-50 flex items-center justify-center p-2">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="modal-content relative bg-white rounded-xl shadow-2xl w-full max-w-md">
+            <!-- En-tête du modal -->
+            <div class="bg-red-600 text-white rounded-t-xl p-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold">Confirmer la suppression</h3>
+                    <button id="close-delete-modal" class="text-white hover:text-red-200 text-xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Contenu du modal -->
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2">Êtes-vous sûr ?</h4>
+                <p class="text-gray-600 mb-6">Vous êtes sur le point de supprimer l'annonce <span class="font-medium" id="annonce-title">Toyota RAV4 2020</span>. Cette action est irréversible.</p>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="cancel-delete" class="w-full sm:w-1/2 border border-gray-300 hover:bg-gray-50 text-gray-700 py-3 px-4 rounded-lg font-medium transition duration-300">
+                        Annuler
+                    </button>
+                    <button id="confirm-delete" class="w-full sm:w-1/2 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-medium transition duration-300">
+                        <i class="fas fa-trash mr-2"></i> Supprimer définitivement
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast de confirmation -->
+    <div id="toast" class="fixed top-4 right-4 z-50">
+        <div class="bg-green-500 text-white rounded-lg shadow-xl p-4 max-w-sm transform translate-y-20 opacity-0 transition-all duration-300" id="toast-content">
+            <div class="flex items-center">
+                <div class="bg-green-600 rounded-full p-2 mr-3">
+                    <i class="fas fa-check text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold" id="toast-title">Action réussie</h4>
+                    <p class="text-sm text-green-100" id="toast-message">L'action a été effectuée avec succès.</p>
+                </div>
+                <button id="close-toast" class="ml-4 text-white hover:text-green-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des liens actifs dans la sidebar
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Gestion des actions dans le tableau
+        let currentAnnonceId = null;
+        let currentAnnonceTitle = '';
+        
+        // Boutons "Désactiver/Activer"
+        document.querySelectorAll('.action-btn:has(.fa-eye-slash), .action-btn:has(.fa-eye)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const annonceId = row.querySelector('td:nth-child(1)').textContent;
+                const annonceTitle = row.querySelector('td:nth-child(3) p:nth-child(1)').textContent;
+                const statusSpan = row.querySelector('td:nth-child(6) span');
+                
+                const isActive = this.querySelector('.fa-eye-slash');
+                
+                if (isActive) {
+                    // Désactiver
+                    statusSpan.textContent = 'Inactif';
+                    statusSpan.className = 'px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded-full';
+                    this.innerHTML = '<i class="fas fa-eye"></i>';
+                    this.title = 'Activer';
+                    showToast('Annonce désactivée', `"${annonceTitle}" a été désactivée avec succès.`);
+                } else {
+                    // Activer
+                    statusSpan.textContent = 'Actif';
+                    statusSpan.className = 'px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full';
+                    this.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    this.title = 'Désactiver';
+                    showToast('Annonce activée', `"${annonceTitle}" a été activée avec succès.`);
+                }
+            });
+        });
+        
+        // Boutons "Modifier"
+        document.querySelectorAll('.action-btn:has(.fa-edit)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const annonceId = row.querySelector('td:nth-child(1)').textContent;
+                const annonceTitle = row.querySelector('td:nth-child(3) p:nth-child(1)').textContent;
+                
+                showToast('Redirection', `Redirection vers l'édition de "${annonceTitle}"...`);
+                // Simuler une redirection
+                setTimeout(() => {
+                    window.location.href = 'edit-article.html';
+                }, 1000);
+            });
+        });
+        
+        // Boutons "Supprimer"
+        document.querySelectorAll('.action-btn:has(.fa-trash)').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const annonceId = row.querySelector('td:nth-child(1)').textContent;
+                const annonceTitle = row.querySelector('td:nth-child(3) p:nth-child(1)').textContent;
+                
+                currentAnnonceId = annonceId;
+                currentAnnonceTitle = annonceTitle;
+                
+                document.getElementById('annonce-title').textContent = annonceTitle;
+                openDeleteModal();
+            });
+        });
+        
+        // Gestion du modal de suppression
+        const deleteModal = document.getElementById('delete-modal');
+        const closeDeleteModalBtn = document.getElementById('close-delete-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        
+        function openDeleteModal() {
+            deleteModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeDeleteModal() {
+            deleteModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        closeDeleteModalBtn.addEventListener('click', closeDeleteModal);
+        cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+        
+        // Fermer le modal en cliquant en dehors
+        deleteModal.addEventListener('click', (e) => {
+            if (e.target === deleteModal) {
+                closeDeleteModal();
+            }
+        });
+        
+        // Confirmation de suppression
+        confirmDeleteBtn.addEventListener('click', () => {
+            // Simuler la suppression
+            const row = document.querySelector(`tr:has(td:first-child:contains("${currentAnnonceId}"))`);
+            if (row) {
+                row.style.opacity = '0.5';
+                setTimeout(() => {
+                    row.remove();
+                    // Mettre à jour les numéros des lignes
+                    updateRowNumbers();
+                    showToast('Suppression réussie', `"${currentAnnonceTitle}" a été supprimée avec succès.`);
+                }, 500);
+            }
+            
+            closeDeleteModal();
+        });
+        
+        // Mettre à jour les numéros de ligne
+        function updateRowNumbers() {
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
+                row.querySelector('td:nth-child(1)').textContent = index + 1;
+            });
+        }
+        
+        // Gestion des filtres
+        const applyFilterBtn = document.querySelector('button:contains("Appliquer")');
+        const resetFilterBtn = document.querySelector('button:contains("Réinitialiser")');
+        
+        if (applyFilterBtn) {
+            applyFilterBtn.addEventListener('click', () => {
+                const category = document.querySelector('select:first-of-type').value;
+                const status = document.querySelector('select:nth-of-type(2)').value;
+                
+                showToast('Filtres appliqués', 'Les filtres ont été appliqués avec succès.');
+            });
+        }
+        
+        if (resetFilterBtn) {
+            resetFilterBtn.addEventListener('click', () => {
+                document.querySelectorAll('select').forEach(select => {
+                    select.value = '';
+                });
+                showToast('Filtres réinitialisés', 'Tous les filtres ont été réinitialisés.');
+            });
+        }
+        
+        // Gestion du toast
+        const toastContent = document.getElementById('toast-content');
+        const toastTitle = document.getElementById('toast-title');
+        const toastMessage = document.getElementById('toast-message');
+        const closeToastBtn = document.getElementById('close-toast');
+        let toastTimeout;
+        
+        function showToast(title, message) {
+            clearTimeout(toastTimeout);
+            
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+            
+            // Afficher le toast
+            setTimeout(() => {
+                toastContent.classList.remove('translate-y-20', 'opacity-0');
+                toastContent.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+            
+            // Masquer automatiquement après 4 secondes
+            toastTimeout = setTimeout(hideToast, 4000);
+        }
+        
+        function hideToast() {
+            toastContent.classList.remove('translate-y-0', 'opacity-100');
+            toastContent.classList.add('translate-y-20', 'opacity-0');
+        }
+        
+        closeToastBtn.addEventListener('click', hideToast);
+        
+        // Gestion des notifications
+        const notificationBtn = document.getElementById('notification-btn');
+        notificationBtn.addEventListener('click', () => {
+            showToast('Notifications', '3 nouvelles notifications');
+        });
+        
+        // Gestion de la pagination
+        document.querySelectorAll('.pagination button:not([disabled])').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (!this.querySelector('i')) {
+                    // C'est un bouton de page numérique
+                    const pageNum = this.textContent;
+                    document.querySelectorAll('.pagination button').forEach(b => {
+                        b.classList.remove('bg-blue-900', 'text-white');
+                        b.classList.add('border', 'hover:bg-gray-50');
+                    });
+                    this.classList.add('bg-blue-900', 'text-white');
+                    this.classList.remove('border', 'hover:bg-gray-50');
+                    
+                    showToast('Changement de page', `Chargement de la page ${pageNum}...`);
+                }
+            });
+        });
+        
+        // Gestion de la barre de recherche
+        const searchInput = document.querySelector('input[placeholder*="Rechercher"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim()) {
+                    showToast('Recherche', `Recherche de "${this.value}" en cours...`);
+                }
+            });
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard MarketPlace chargé');
+        });
+    </script>
+</body>
+</html>
